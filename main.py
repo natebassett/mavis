@@ -2,7 +2,7 @@ from dispatcher import handle_command
 from speech import listen, speak
 import keyboard
 
-HOTKEY = "ctrl+shift+m"
+HOTKEY = "ctrl+shift+q"
 
 def main():
     print(f"[MAVIS] Ready! Press {HOTKEY} or type a command.")

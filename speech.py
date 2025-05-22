@@ -14,11 +14,12 @@ if not os.path.exists(model_path):
 
 model = vosk.Model(model_path)
 q = queue.Queue()
-tts = pyttsx3.init()
 
 def speak(text):
-    tts.say(text)
-    tts.runAndWait()
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+    engine.stop()
 
 def callback(indata, frames, time, status):
     if status:
