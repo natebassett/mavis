@@ -24,7 +24,7 @@
 
 ## Memory System
 
-* [ ] SQLite memory database
+* [x] SQLite memory database
 * [ ] Memory retrieval system
 * [ ] Preference storage
 * [ ] Semantic memory search
