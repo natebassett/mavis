@@ -195,7 +195,7 @@ class MemoryManager:
 
         return scored_memories[:limit]
     
-    # long term methods
+    # long term methods     
     def get_important_memories(self, minimum_importance=4):
         with self.database.connect() as connection:
             cursor = connection.cursor()

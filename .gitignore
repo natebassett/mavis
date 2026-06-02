@@ -20,6 +20,9 @@ logs/
 .vscode/
 .idea/
 
+# Keep template env
+!.env.example
+
 # OS
 .DS_Store
 Thumbs.db
