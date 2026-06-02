@@ -25,10 +25,10 @@
 ## Memory System
 
 * [x] SQLite memory database
-* [ ] Memory retrieval system
-* [ ] Preference storage
-* [ ] Semantic memory search
-* [ ] Long-term memory handling
+* [x] Memory retrieval system
+* [x] Preference storage
+* [x] Semantic memory search
+* [x] Long-term memory handling
 
 ---
 
