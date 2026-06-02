@@ -6,7 +6,13 @@ class MemoryManager:
         self.database = Database()
         self.semantic_search = SemanticSearch()
 
-    def add_memory(self, content, memory_type="general", importance=1):
+    def add_memory(
+        self,
+        content,
+        memory_type="general",
+        importance=1,
+        is_permanent=False
+    ):  
         embedding = self.semantic_search.create_embedding(content)
 
         with self.database.connect() as connection:
@@ -17,10 +23,17 @@ class MemoryManager:
                     content,
                     memory_type,
                     importance,
-                    embedding
+                    embedding,
+                    is_permanent
                 )
-                VALUES (?, ?, ?, ?)
-            """, (content, memory_type, importance, embedding))
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                content,
+                memory_type,
+                importance,
+                embedding,
+                int(is_permanent)
+            ))
 
             connection.commit()
 
@@ -181,3 +194,73 @@ class MemoryManager:
         )
 
         return scored_memories[:limit]
+    
+    # long term methods
+    def get_important_memories(self, minimum_importance=4):
+        with self.database.connect() as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                SELECT
+                    id,
+                    content,
+                    memory_type,
+                    importance,
+                    is_permanent,
+                    created_at
+                FROM memories
+                WHERE importance >= ?
+                ORDER BY importance DESC, created_at DESC
+            """, (minimum_importance,))
+
+            return cursor.fetchall()
+
+    def get_permanent_memories(self):
+        with self.database.connect() as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                SELECT
+                    id,
+                    content,
+                    memory_type,
+                    importance,
+                    is_permanent,
+                    created_at
+                FROM memories
+                WHERE is_permanent = 1
+                ORDER BY importance DESC, created_at DESC
+            """)
+
+            return cursor.fetchall()
+
+    def update_memory(self, memory_id, new_content):
+        embedding = self.semantic_search.create_embedding(new_content)
+
+        with self.database.connect() as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                UPDATE memories
+                SET
+                    content = ?,
+                    embedding = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """, (new_content, embedding, memory_id))
+
+            connection.commit()
+
+    def delete_memory(self, memory_id):
+        with self.database.connect() as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                DELETE FROM memories
+                WHERE id = ?
+                AND is_permanent = 0
+            """, (memory_id,))
+
+            connection.commit()
+
+            return cursor.rowcount

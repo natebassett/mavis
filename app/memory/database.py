@@ -48,6 +48,12 @@ class Database:
                     ADD COLUMN embedding TEXT
                 """)
 
+            if "is_permanent" not in existing_columns:
+                cursor.execute("""
+                    ALTER TABLE memories
+                    ADD COLUMN is_permanent INTEGER DEFAULT 0
+                """)
+
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS preferences (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
