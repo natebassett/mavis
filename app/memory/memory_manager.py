@@ -1,11 +1,14 @@
 from app.memory.database import Database
-
+from app.memory.semantic_search import SemanticSearch
 
 class MemoryManager:
     def __init__(self):
         self.database = Database()
+        self.semantic_search = SemanticSearch()
 
     def add_memory(self, content, memory_type="general", importance=1):
+        embedding = self.semantic_search.create_embedding(content)
+
         with self.database.connect() as connection:
             cursor = connection.cursor()
 
@@ -13,10 +16,11 @@ class MemoryManager:
                 INSERT INTO memories (
                     content,
                     memory_type,
-                    importance
+                    importance,
+                    embedding
                 )
-                VALUES (?, ?, ?)
-            """, (content, memory_type, importance))
+                VALUES (?, ?, ?, ?)
+            """, (content, memory_type, importance, embedding))
 
             connection.commit()
 
@@ -117,3 +121,63 @@ class MemoryManager:
             """, (key,))
 
             connection.commit()
+
+    def semantic_search_memories(self, query, limit=5):
+        query_embedding_text = self.semantic_search.create_embedding(query)
+        query_embedding = self.semantic_search.load_embedding(
+            query_embedding_text
+        )
+
+        with self.database.connect() as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                SELECT
+                    id,
+                    content,
+                    memory_type,
+                    importance,
+                    embedding,
+                    created_at
+                FROM memories
+                WHERE embedding IS NOT NULL
+            """)
+
+            memories = cursor.fetchall()
+
+        scored_memories = []
+
+        for memory in memories:
+            memory_id = memory[0]
+            content = memory[1]
+            memory_type = memory[2]
+            importance = memory[3]
+            embedding_text = memory[4]
+            created_at = memory[5]
+
+            memory_embedding = self.semantic_search.load_embedding(
+                embedding_text
+            )
+
+            score = self.semantic_search.similarity(
+                query_embedding,
+                memory_embedding
+            )
+
+            scored_memories.append(
+                {
+                    "id": memory_id,
+                    "content": content,
+                    "memory_type": memory_type,
+                    "importance": importance,
+                    "score": score,
+                    "created_at": created_at,
+                }
+            )
+
+        scored_memories.sort(
+            key=lambda item: item["score"],
+            reverse=True
+        )
+
+        return scored_memories[:limit]

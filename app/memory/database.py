@@ -31,10 +31,22 @@ class Database:
                     content TEXT NOT NULL,
                     memory_type TEXT DEFAULT 'general',
                     importance INTEGER DEFAULT 1,
+                    embedding TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+
+            cursor.execute("PRAGMA table_info(memories)")
+            existing_columns = [
+                column[1] for column in cursor.fetchall()
+            ]
+
+            if "embedding" not in existing_columns:
+                cursor.execute("""
+                    ALTER TABLE memories
+                    ADD COLUMN embedding TEXT
+                """)
 
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS preferences (
