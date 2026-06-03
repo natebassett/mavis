@@ -39,7 +39,7 @@
 * [ ] Application launcher
 * [ ] System command execution
 * [ ] File management actions
-* [ ] Background runtime
+* [x] Background runtime
 
 ## Wake System
 
