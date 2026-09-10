@@ -72,6 +72,8 @@ Input adapters (typed now; voice later)
 
 The central rule is simple: MAVIS core code talks to capability interfaces, not directly to a microphone, model, light, lock, or cloud service. A simulated implementation can therefore be used during development and replaced by a real adapter later.
 
+The concrete Phase 2 contract is documented in [docs/capability-framework.md](docs/capability-framework.md).
+
 ## Repository layout
 
 ```text
@@ -82,6 +84,7 @@ app/
   memory/       SQLite storage and semantic memory utilities
   utils/        Shared utilities, including logging
 tests/          Current development checks and examples
+docs/           Architecture and public contract documentation
 main.py         Console entry point
 ROADMAP.md      Product roadmap and scope controls
 ```
