@@ -1,236 +1,130 @@
 # MAVIS
 
-### Multi-functional Artificial Virtual Intelligence System
+> A local-first personal assistant platform, built software-first and designed to become an always-on home assistant.
 
-MAVIS is a long-term AI assistant project focused on building a privacy-first, modular, multi-agent virtual assistant capable of both offline and online operation.
+MAVIS (Multi-functional Artificial Virtual Intelligence System) is a long-term engineering project to create a private, extensible assistant that can grow from a dependable local software runtime into a home-hosted system. The project begins with the software foundations that can be built and tested today; dedicated hardware, voice endpoints, local models, and real smart-home devices are added only when they are available.
 
-Inspired by systems such as JARVIS, the goal of MAVIS is not simply to create a chatbot, but to engineer a scalable AI ecosystem capable of:
+The goal is not to imitate a chatbot. MAVIS is being designed as a maintainable assistant platform with memory, explicit permissions, modular capabilities, and a controlled path to local AI models and home integration.
 
-* Natural intent understanding
-* Dynamic memory and preference learning
-* Voice interaction and speaker recognition
-* Modular skill execution
-* Desktop and application control
-* Online and offline hybrid intelligence
-* AI-assisted module generation
-* Secure local-first personal memory
+## Project status
 
----
+MAVIS is in its foundation stage. The current repository contains a working Python baseline, not a finished assistant.
 
-# Vision
+Implemented today:
 
-MAVIS is designed as a personal AI system that evolves alongside its user.
+- Configuration loading from environment variables.
+- Structured application logging.
+- A console-based background runtime.
+- A basic orchestrator shell.
+- Keyword intent routing with confidence and fallback results.
+- SQLite-backed memories and preferences.
+- Semantic memory embeddings and similarity search.
+- An in-process message bus and agent-message type.
 
-Rather than relying purely on rigid command structures, MAVIS aims to understand intent semantically. This allows multiple phrases to map to the same action naturally.
+Not yet implemented:
 
-Example:
+- An LLM integration or local Ollama deployment.
+- Tool execution, permission policies, or simulated devices.
+- Voice input/output, wake-word detection, and speaker recognition.
+- A web/dashboard interface, real smart-home integration, or an always-on server deployment.
 
-```text
-"Launch Spotify"
-"Play some music"
-"I need some music right now"
-```
+The detailed, living plan is in [ROADMAP.md](ROADMAP.md).
 
-All map to the same intent:
+## Product direction
 
-```text
-open_music_app
-```
+MAVIS is intended to become:
 
-The system is being built bottom-up using principles from:
+- **Local-first:** personal data, memory, and core operations stay under the owner's control wherever possible.
+- **Safe by design:** high-impact actions require explicit approval and leave an auditable record.
+- **Modular:** capabilities such as models, voice, device control, and integrations are replaceable adapters rather than hard-coded dependencies.
+- **Software-first:** simulated interfaces and automated checks are built before physical hardware is required.
+- **Evolvable:** code, prompts, tools, model configurations, and future fine-tuning adapters can be versioned, evaluated, upgraded, and rolled back.
 
-* Artificial Intelligence
-* Machine Learning
-* Multi-Agent Systems
-* Natural Language Processing
-* Data Science
-* Software Engineering
-* Human-Computer Interaction
+The eventual home deployment may use a local model runtime such as Ollama. MAVIS will own the assistant experience around a chosen model—its tools, memory, policies, knowledge, and update process—rather than depend on training a frontier language model from scratch.
 
----
+## Development milestones
 
-# Core Features (Planned)
+1. **MAVIS Kernel** — dependable architecture, storage, routing, and boundaries.
+2. **MAVIS Sandbox** — a typed, fully simulated assistant with safe action planning and tests.
+3. **MAVIS Mind** — editable memory, routines, preferences, planning data, and personal context.
+4. **MAVIS Interfaces** — simulated contracts for voice, rooms, devices, displays, and integrations.
+5. **MAVIS Product** — dashboard/API, operations, backups, monitoring, update, and rollback workflows.
+6. **MAVIS Home** — deployment to real always-on hardware, local models, and home devices.
+7. **MAVIS Developer** — a later coding-assistant capability, added once suitable model hardware is available.
 
-## Multi-Agent Architecture
+Each milestone has a defined outcome and remains useful after later hardware is added. See [ROADMAP.md](ROADMAP.md) for scope and acceptance criteria.
 
-MAVIS uses specialist agents coordinated through a central orchestration layer.
-
-Planned agents include:
-
-* Orchestrator Agent
-* Intent Agent
-* Memory Agent
-* Voice Agent
-* Security Agent
-* Skill/Module Agent
-* Web Agent
-* Planning Agent
-* Coding Assistant Agent
-
----
-
-## Dynamic Memory System
-
-MAVIS is intended to remember:
-
-* Preferences
-* Routines
-* Schedules
-* Corrections
-* User-defined facts
-* Frequently used actions
-* Long-term contextual information
-
-Example:
+## Architecture
 
 ```text
-"Remember that I use Spotify while coding."
+Input adapters (typed now; voice later)
+                |
+          MAVIS runtime
+                |
+   Orchestration and intent routing
+          |                 |
+     Memory layer      Capability adapters
+     (SQLite +         (simulated now; real
+      semantic search)  devices/models later)
+                |
+       Logs, settings, and audit records
 ```
 
----
+The central rule is simple: MAVIS core code talks to capability interfaces, not directly to a microphone, model, light, lock, or cloud service. A simulated implementation can therefore be used during development and replaced by a real adapter later.
 
-## Voice System
-
-Planned voice features include:
-
-* Wake word activation
-* Speaker recognition
-* Text-to-speech
-* Speech-to-text
-* Mute mode
-* Deafen mode
-* Background startup service
-
----
-
-## Hybrid Online/Offline Operation
-
-MAVIS is being designed to function both locally and with cloud-assisted intelligence.
-
-### Offline
-
-* Local memory
-* Local intent matching
-* Local skill execution
-* Local speech systems
-
-### Online
-
-* OpenAI integration
-* Web search
-* API integrations
-* Cloud-enhanced reasoning
-
----
-
-# Planned Technology Stack
-
-| Area                 | Technologies             |
-| -------------------- | ------------------------ |
-| Language             | Python                   |
-| UI/UX                | PyQt6                    |
-| Memory Database      | SQLite                   |
-| Semantic Memory      | ChromaDB / FAISS         |
-| Speech-to-Text       | Whisper / faster-whisper |
-| Text-to-Speech       | Piper / Coqui            |
-| Intent Understanding | Sentence Transformers    |
-| AI APIs              | OpenAI                   |
-| Local Models         | Ollama / Local LLMs      |
-| Automation           | Python skills/modules    |
-
----
-
-# Security & Privacy
-
-MAVIS is designed with a privacy-first approach.
-
-The repository intentionally excludes:
-
-* Personal memory databases
-* API keys
-* Voiceprints
-* Recorded audio
-* Authentication credentials
-* Logs containing sensitive data
-
-Sensitive data is managed locally through:
+## Repository layout
 
 ```text
-.env
-.gitignore
-Local-only databases
+app/
+  config/       Environment-based configuration
+  core/         Runtime, orchestration, messaging
+  intent/       Intent types and routing
+  memory/       SQLite storage and semantic memory utilities
+  utils/        Shared utilities, including logging
+tests/          Current development checks and examples
+main.py         Console entry point
+ROADMAP.md      Product roadmap and scope controls
 ```
 
----
+## Getting started
 
-# Example Repository Structure
+Prerequisites: Python 3.11 or later is recommended.
 
-```text
-MAVIS/
-│
-├── core/
-├── agents/
-├── skills/
-├── memory/
-├── voice/
-├── ui/
-├── data/
-├── docs/
-├── tests/
-│
-├── main.py
-├── requirements.txt
-├── .env.example
-├── .gitignore
-└── README.md
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+python main.py
 ```
 
----
+The current runtime accepts text in the terminal. Enter `exit`, `quit`, or `shutdown` to stop it.
 
-# Current Development Goals
+The files in `tests/` are currently development checks and examples. A formal automated test suite is a required outcome of the MAVIS Sandbox phase.
 
-* [ ] Build MAVIS core orchestrator
-* [ ] Create semantic intent routing system
-* [ ] Implement local memory storage
-* [ ] Build modular skill architecture
-* [ ] Add application launching system
-* [ ] Implement wake word detection
-* [ ] Add speech-to-text pipeline
-* [ ] Create speaker recognition system
-* [ ] Build PyQt6 dashboard
-* [ ] Implement online/offline switching
-* [ ] Add secure permissions layer
-* [ ] Develop AI-assisted module generation
+## Configuration and privacy
 
----
+Copy `.env.example` to `.env` and keep `.env` private. Do not commit API keys, local databases, recordings, voice profiles, personal logs, or credentials.
 
-# Long-Term Goals
+Current configuration values include:
 
-* Full desktop assistant
-* Smart home integration
-* Wearable/smart-glasses integration
-* Real-time contextual assistance
-* Autonomous task planning
-* Multi-user recognition
-* Distributed local AI ecosystem
+| Variable | Purpose |
+| --- | --- |
+| `MAVIS_ENV` | Selects the runtime environment. |
+| `LOG_LEVEL` | Sets application log verbosity. |
+| `DATABASE_PATH` | Sets the local SQLite memory database path. |
+| `WAKE_WORD` | Reserves the wake phrase setting for future voice support. |
+| `OPENAI_API_KEY` | Reserved for an optional future provider; it is not required by the current runtime. |
 
----
+## Scope discipline
 
-# Disclaimer
+MAVIS is deliberately ambitious, so additions must protect its foundation:
 
-MAVIS is an active long-term research and development project.
+- Complete a small end-to-end slice before beginning a broad new subsystem.
+- Keep physical-world effects behind explicit, tested permission checks.
+- Treat the roadmap as a living document: revise scope at phase boundaries, then record the decision.
+- Keep “train a foundation model from scratch” outside the critical path. Local models, retrieval, adapters, and evaluation provide meaningful ownership without blocking the platform.
 
-The system is being developed incrementally with a focus on:
+## Author
 
-* maintainability,
-* scalability,
-* privacy,
-* modularity,
-* and responsible AI engineering.
-
----
-
-# Author
-
-Nathaniel Bassett
-Software Engineering & Data Science
+Nathaniel Bassett — Software Engineering & Data Science
