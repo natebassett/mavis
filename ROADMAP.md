@@ -14,6 +14,38 @@ It is a living plan, not a promise to build every idea at once. Every phase must
 - **Replaceable intelligence:** model providers, prompts, retrieval, and future adapters are versioned components, not the MAVIS core.
 - **Incremental delivery:** finish narrow vertical slices instead of building disconnected feature collections.
 
+## Delivery model
+
+MAVIS uses a phase-based feature-branch workflow. It keeps the stable product line protected while allowing the active phase to evolve through small, reviewable changes.
+
+```text
+main                         Stable, release-ready history
+└── p2/sandbox               Active Phase 2 integration branch
+    └── p2/<feature>         Focused, short-lived feature branch
+```
+
+The same convention applies to later phases, for example `p3/<feature>` and `p4/<feature>`.
+
+### Branch responsibilities
+
+| Branch | Responsibility |
+| --- | --- |
+| `main` | Contains only validated, release-ready milestones. Each completed phase is merged here. |
+| `p<phase>/<integration>` | Integrates tested features for one active phase; currently `p2/sandbox`. |
+| `p<phase>/<feature>` | Contains one coherent, independently reviewable outcome and its tests. |
+
+### Feature quality gate
+
+Before a feature branch merges into its phase integration branch, it must:
+
+1. Have a narrow written purpose and avoid unrelated changes.
+2. Include automated tests or documented validation appropriate to the feature.
+3. Update relevant documentation, configuration examples, or migration notes.
+4. Pass the phase integration checks.
+5. Be reviewed through a pull request, including self-review when MAVIS is a solo project.
+
+Feature branches are created from the current phase integration branch and merged back promptly. Avoid opening dependent branches at the same time; begin the next one after its prerequisite has reached the integration branch.
+
 ---
 
 ## Phase 1 — MAVIS Kernel
@@ -44,18 +76,45 @@ It is a living plan, not a promise to build every idea at once. Every phase must
 
 ### Scope
 
-- [ ] Define capability interfaces for action execution, model responses, and device state.
-- [ ] Implement a simulated household: rooms, lights, locks, and routine device states.
-- [ ] Add action planning, risk classification, confirmations, and an audit log.
+- [ ] Define capability interfaces for action execution, model responses, device state, and structured execution results.
+- [ ] Implement a capability registry, shared error types, and configuration validation.
+- [ ] Implement a simulated household: rooms, users, lights, locks, scenes, and routine device states.
+- [ ] Add an action lifecycle: plan, validate, request approval, execute, and record a result.
+- [ ] Add risk classification, permission rules, confirmation flows, dry-run mode, and an emergency stop.
+- [ ] Add a timestamped audit/event trail with human-readable explanations and correlation identifiers.
+- [ ] Add resettable simulation state, deterministic time, scenario fixtures, and simulated failure modes.
+- [ ] Define a `ModelProvider` boundary with a fake scripted implementation; do not add a real LLM runtime yet.
+- [ ] Define the memory-context boundary needed by actions; richer personal memory remains Phase 3 work.
 - [ ] Connect the orchestrator to intent, memory, and simulated capabilities.
-- [ ] Create a formal automated test suite and scenario fixtures.
-- [ ] Establish a text-command interaction loop with useful help and status output.
+- [ ] Create a formal automated unit, integration, and acceptance test suite.
+- [ ] Establish a text-command interaction loop with useful help, status, and diagnostic output.
+
+### Planned delivery streams
+
+Phase 2 is intentionally split into focused feature branches. Each stream includes its own tests and documentation, then merges into `p2/sandbox` before the next dependent stream begins.
+
+| Order | Feature branch | Outcome | Depends on |
+| ---: | --- | --- | --- |
+| 1 | `p2/capability-framework` | Stable contracts for capabilities, requests, results, errors, and registration. | MAVIS Kernel |
+| 2 | `p2/test-harness` | Test layout, fixtures, scenario conventions, and integration checks. | MAVIS Kernel |
+| 3 | `p2/digital-home` | Simulated rooms, users, devices, scenes, and deterministic state changes. | Capability framework, test harness |
+| 4 | `p2/action-lifecycle` | Structured planning, validation, execution, and result handling. | Capability framework, digital home |
+| 5 | `p2/safety-policy` | Risk levels, confirmations, permissions, dry-run, and emergency-stop rules. | Action lifecycle |
+| 6 | `p2/audit-events` | Inspectable event history, explanations, and action correlation. | Action lifecycle, safety policy |
+| 7 | `p2/simulation-tools` | State reset, deterministic clock, fixtures, and fault injection. | Digital home, test harness |
+| 8 | `p2/model-provider-contract` | Replaceable model interface and a fake scripted provider for tests. | Capability framework |
+| 9 | `p2/memory-contract` | Explicit action-to-memory context and storage boundary. | Capability framework |
+| 10 | `p2/diagnostics` | Health/status output, configuration checks, and developer diagnostics. | Action lifecycle, audit events |
+
+The initial sequence is deliberate: it creates the shared contracts and quality infrastructure before behaviour is added. This allows real devices, voice, model runtimes, dashboards, and future coding tools to replace adapters rather than restructure the assistant core.
 
 ### Exit criteria
 
 - MAVIS safely completes at least 20 documented text-command scenarios against simulated devices.
-- Every state-changing action has a recorded decision, result, and simulated target.
-- The scenario suite runs without microphones, speakers, local models, or smart-home hardware.
+- Every state-changing action has a recorded decision, approval state, result, and simulated target.
+- The scenario suite covers success, refusal, cancellation, invalid input, and simulated-device failure paths.
+- Simulation state can be reset and scenarios can be replayed deterministically.
+- The phase integration branch passes all automated checks without microphones, speakers, local models, or smart-home hardware.
 
 ---
 
